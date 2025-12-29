@@ -1,0 +1,19 @@
+{
+  "name": "matchlab",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "pnpm -r --parallel dev",
+    "dev:backend": "pnpm --filter @matchlab/backend dev",
+    "dev:frontend": "pnpm --filter @matchlab/frontend dev",
+    "build": "pnpm -r build",
+    "test": "pnpm -r test",
+    "db:generate": "pnpm --filter @matchlab/backend db:generate",
+    "db:migrate": "pnpm --filter @matchlab/backend db:migrate",
+    "db:seed": "pnpm --filter @matchlab/backend db:seed",
+    "db:studio": "pnpm --filter @matchlab/backend db:studio"
+  },
+  "devDependencies": {
+    "typescript": "^5.3.3"
+  }
+}

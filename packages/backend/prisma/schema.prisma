@@ -1,0 +1,494 @@
+// MatchLab Prisma Schema
+// PRD 기반 13개 엔티티 정의
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+// =========================================
+// 1. User - 사용자 계정
+// =========================================
+model User {
+  id            String   @id @default(cuid())
+  email         String   @unique
+  password      String   // bcrypt hashed
+  nickname      String
+  status        String   @default("active") // active, inactive, banned
+  lastActiveAt  DateTime @default(now())
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  // Relations
+  profile       Profile?
+  traitResult   TraitResult?
+  startupMbti   StartupMBTI?
+  evidenceLinks EvidenceLink[]
+  trustScore    TrustScore?
+
+  // Matching
+  sentInvites     Invite[]   @relation("SentInvites")
+  receivedInvites Invite[]   @relation("ReceivedInvites")
+  matchesAsViewer MatchScore[] @relation("MatchViewer")
+  matchesAsCandidate MatchScore[] @relation("MatchCandidate")
+
+  // Messaging
+  sentMessages     Message[] @relation("SentMessages")
+  conversations    ConversationParticipant[]
+
+  // Team
+  teamMemberships  TeamMember[]
+  checkIns         CheckIn[]
+  
+  // Feedback
+  givenFeedbacks   Feedback[] @relation("GivenFeedbacks")
+  receivedFeedbacks Feedback[] @relation("ReceivedFeedbacks")
+
+  // Safety
+  sentReports      Report[] @relation("SentReports")
+  receivedReports  Report[] @relation("ReceivedReports")
+  blocks           Block[]  @relation("Blocker")
+  blockedBy        Block[]  @relation("Blocked")
+  
+  // Notifications
+  notifications    Notification[]
+
+  @@map("users")
+}
+
+// =========================================
+// 2. Profile - 사용자 프로필
+// =========================================
+model Profile {
+  id                String   @id @default(cuid())
+  userId            String   @unique
+  user              User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  // 기본 정보
+  bio               String?
+  location          String?
+  locationPref      String   @default("flexible") // remote_only, onsite_only, hybrid, flexible
+
+  // 커밋 정보
+  availabilityHours Int      // 주당 투입 가능 시간
+  startDate         DateTime // 시작 가능 시점
+
+  // 도메인/역할
+  domains           String   // JSON array: ["commerce", "fintech"]
+  roleCan           String   @default("[]") // JSON array: 할 수 있는 역할
+  roleWant          String   @default("[]") // JSON array: 하고 싶은 역할
+  roleNeed          String   // JSON array: 찾는 역할 (부족한 역할)
+  skills            String   @default("[]") // JSON array: 보유 스킬
+
+  // 목표
+  goal              String   // investment, revenue, tech_validation, side_project, hackathon
+
+  // 소통 규칙
+  commChannel       String?  // slack, discord, kakao, zoom, notion, other
+  responseSla       Int?     // 응답 SLA (시간 단위)
+  meetingFreq       String?  // daily, twice_week, weekly, biweekly
+
+  // 의사결정 스타일 (1-5 척도)
+  decisionConsensus Int?     // 합의 vs 탑다운
+  decisionData      Int?     // 데이터 vs 직관
+  decisionSpeed     Int?     // 빠른결정 vs 신중
+  decisionFlexibility Int?   // 유연 vs 원칙
+  decisionRisk      Int?     // 리스크테이킹 vs 안전
+
+  // 갈등 대응
+  conflictStyle     String?  // direct, indirect, avoid, compromise
+
+  // 완성도
+  completeness      Int      @default(0) // 0-100
+
+  // 공개 설정
+  isPublic          Boolean  @default(true)
+
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+
+  @@map("profiles")
+}
+
+// =========================================
+// 3. TraitResult - 창업 MBTI 결과 (간단 버전)
+// =========================================
+model TraitResult {
+  id            String   @id @default(cuid())
+  userId        String   @unique
+  user          User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  // 6개 축 응답 (1 또는 2)
+  leadership    Int      // 1=리더, 2=팔로워
+  execution     Int      // 1=빠름, 2=신중
+  communication Int      // 1=수시, 2=정기
+  risk          Int      // 1=리스크추구, 2=안정추구
+  conflict      Int      // 1=직접, 2=간접
+  flexibility   Int      // 1=유연, 2=체계
+
+  // 버전 관리
+  version       Int      @default(1)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  @@map("trait_results")
+}
+
+// =========================================
+// 3-1. StartupMBTI - 창업 MBTI 전체 결과 (외부 진단 데이터)
+// =========================================
+model StartupMBTI {
+  id             String   @id @default(cuid())
+  userId         String?  @unique
+  user           User?    @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  // 외부 시스템 ID (PST2512ME63603 형식)
+  externalId     String   @unique
+  
+  // 기본 정보
+  mbtiType       String   // ISTP, INFP 등
+  mbtiTitle      String?  // "실용적인 문제해결사", "이상적인 혁신가" 등
+
+  // 창업자 기본 성향 (0-100)
+  innovationLearning  Int  // 혁신 & 학습
+  sensitivityNervous  Int  // 예민 & 신경
+  socialActivity      Int  // 사교 & 활동
+  cooperationCare     Int  // 협력 & 배려
+  planExecution       Int  // 계획 & 추진
+
+  // 완벽주의 성향 (0-100)
+  apPerfectionism     Int  // AP: 내부적 완벽 추구
+  eopPerfectionism    Int  // EOP: 외부 평가 기반 완벽 추구
+  iopPerfectionism    Int  // IOP: 이상 추구형 완벽 추구
+
+  // 동기 요인 (0-100)
+  motivationGrowth    Int  // 성장
+  motivationAchieve   Int  // 성취
+  motivationRecognition Int // 인정
+
+  // 보상 요인 (0-100)
+  rewardCompensation  Int  // 보상 (급여)
+  rewardAutonomy      Int  // 자율성
+  rewardStability     Int  // 안정성
+
+  // 파트너쉽 유형 (0-100)
+  partnerSelfishness  Int  // 이기심
+  partnerCooperation  Int  // 동업성향
+  partnerEntrepreneurship Int // 기업가정신
+
+  // 스트레스
+  stressIndex         Int  // 스트레스 지수 (0-100)
+
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  @@map("startup_mbti")
+}
+
+// =========================================
+// 4. EvidenceLink - 증거 링크 (포트폴리오 등)
+// =========================================
+model EvidenceLink {
+  id             String   @id @default(cuid())
+  userId         String
+  user           User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  type           String   // github, notion, portfolio, linkedin, blog, other
+  url            String
+  title          String?
+  summary        String?  // AI 또는 수동 요약
+  tags           String   @default("[]") // JSON array: 추출된 태그
+  verifiedByUser Boolean  @default(false) // 사용자 확인 여부
+  isPublic       Boolean  @default(false) // 공개 여부
+
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  @@map("evidence_links")
+}
+
+// =========================================
+// 5. TrustScore - 신뢰도 점수
+// =========================================
+model TrustScore {
+  id               String   @id @default(cuid())
+  userId           String   @unique
+  user             User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  completeness     Int      @default(0) // 프로필 완성도 (0-100)
+  evidenceStrength Int      @default(0) // 근거 강도 (0-100)
+  activity         Int      @default(0) // 활동성 (0-100)
+  reputation       Int      @default(0) // 평판 (0-100)
+  total            Int      @default(0) // 종합 점수 (0-100)
+
+  updatedAt        DateTime @updatedAt
+
+  @@map("trust_scores")
+}
+
+// =========================================
+// 6. MatchScore - 매칭 점수 캐시
+// =========================================
+model MatchScore {
+  id            String   @id @default(cuid())
+  viewerId      String   // 보는 사람
+  candidateId   String   // 후보자
+  viewer        User     @relation("MatchViewer", fields: [viewerId], references: [id], onDelete: Cascade)
+  candidate     User     @relation("MatchCandidate", fields: [candidateId], references: [id], onDelete: Cascade)
+
+  // 점수
+  stability     Int      // 안정성 (0-100)
+  synergy       Int      // 시너지 (0-100)
+  trust         Int      // 신뢰 (0-100)
+  penalties     Int      @default(0) // 패널티 합계
+  total         Int      // 최종 점수
+
+  // 설명
+  reasonsTop3   String   // JSON array: 추천 이유 Top3
+  caution       String?  // 주의점 1개
+
+  // 캐시 관리
+  calculatedAt  DateTime @default(now())
+
+  @@unique([viewerId, candidateId])
+  @@map("match_scores")
+}
+
+// =========================================
+// 7. Invite - 초대
+// =========================================
+model Invite {
+  id          String   @id @default(cuid())
+  fromUserId  String
+  toUserId    String
+  fromUser    User     @relation("SentInvites", fields: [fromUserId], references: [id], onDelete: Cascade)
+  toUser      User     @relation("ReceivedInvites", fields: [toUserId], references: [id], onDelete: Cascade)
+
+  status      String   @default("pending") // pending, accepted, declined, expired
+  message     String?  // 초대 메시지
+
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // 수락 시 생성된 팀
+  teamId      String?
+  team        Team?    @relation(fields: [teamId], references: [id])
+
+  @@unique([fromUserId, toUserId])
+  @@map("invites")
+}
+
+// =========================================
+// 8. Conversation & Message - 대화/메시지
+// =========================================
+model Conversation {
+  id           String   @id @default(cuid())
+  participants ConversationParticipant[]
+  messages     Message[]
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  @@map("conversations")
+}
+
+model ConversationParticipant {
+  id             String       @id @default(cuid())
+  conversationId String
+  userId         String
+  conversation   Conversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+  user           User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  lastReadAt     DateTime?
+  createdAt      DateTime     @default(now())
+
+  @@unique([conversationId, userId])
+  @@map("conversation_participants")
+}
+
+model Message {
+  id             String       @id @default(cuid())
+  conversationId String
+  senderId       String
+  conversation   Conversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+  sender         User         @relation("SentMessages", fields: [senderId], references: [id], onDelete: Cascade)
+
+  content        String
+  createdAt      DateTime     @default(now())
+
+  @@map("messages")
+}
+
+// =========================================
+// 9. Team - 팀
+// =========================================
+model Team {
+  id              String   @id @default(cuid())
+  name            String
+  goal            String
+  rnr             String   @default("{}") // JSON: { "userId": "역할 설명" }
+  meetingSchedule String?  // 미팅 일정 설명
+  status          String   @default("active") // active, completed, dissolved
+
+  members         TeamMember[]
+  sprints         Sprint[]
+  invites         Invite[]
+  feedbacks       Feedback[]
+
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  @@map("teams")
+}
+
+model TeamMember {
+  id        String   @id @default(cuid())
+  teamId    String
+  userId    String
+  team      Team     @relation(fields: [teamId], references: [id], onDelete: Cascade)
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  role      String   // 팀 내 역할
+  joinedAt  DateTime @default(now())
+
+  @@unique([teamId, userId])
+  @@map("team_members")
+}
+
+// =========================================
+// 10. Sprint - 2주 스프린트
+// =========================================
+model Sprint {
+  id             String   @id @default(cuid())
+  teamId         String
+  team           Team     @relation(fields: [teamId], references: [id], onDelete: Cascade)
+
+  startDate      DateTime
+  endDate        DateTime
+  status         String   @default("not_started") // not_started, in_progress, completed, cancelled
+
+  checklistItems ChecklistItem[]
+  checkIns       CheckIn[]
+
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  @@map("sprints")
+}
+
+model ChecklistItem {
+  id           String   @id @default(cuid())
+  sprintId     String
+  sprint       Sprint   @relation(fields: [sprintId], references: [id], onDelete: Cascade)
+
+  title        String
+  description  String?
+  assigneeId   String?
+  completed    Boolean  @default(false)
+  completedAt  DateTime?
+
+  order        Int      @default(0)
+  createdAt    DateTime @default(now())
+
+  @@map("checklist_items")
+}
+
+// =========================================
+// 11. CheckIn - 체크인
+// =========================================
+model CheckIn {
+  id           String   @id @default(cuid())
+  sprintId     String
+  userId       String
+  sprint       Sprint   @relation(fields: [sprintId], references: [id], onDelete: Cascade)
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  progress     Int      // 0-100
+  satisfaction Int      // 1-5
+  blockers     String?  // 장애물/이슈
+  notes        String?
+
+  createdAt    DateTime @default(now())
+
+  @@map("check_ins")
+}
+
+// =========================================
+// 12. Feedback - 피드백/평판
+// =========================================
+model Feedback {
+  id                 String   @id @default(cuid())
+  fromUserId         String
+  toUserId           String
+  teamId             String
+  fromUser           User     @relation("GivenFeedbacks", fields: [fromUserId], references: [id], onDelete: Cascade)
+  toUser             User     @relation("ReceivedFeedbacks", fields: [toUserId], references: [id], onDelete: Cascade)
+  team               Team     @relation(fields: [teamId], references: [id], onDelete: Cascade)
+
+  ratingPromise      Int      // 약속 준수 (1-5)
+  ratingResponse     Int      // 응답성 (1-5)
+  ratingContribution Int      // 기여도 (1-5)
+  comment            String?
+
+  decision           String?  // continue, dissolve, rematch
+
+  createdAt          DateTime @default(now())
+
+  @@unique([fromUserId, toUserId, teamId])
+  @@map("feedbacks")
+}
+
+// =========================================
+// 13. Report & Block - 신고/차단
+// =========================================
+model Report {
+  id           String   @id @default(cuid())
+  fromUserId   String
+  toUserId     String
+  fromUser     User     @relation("SentReports", fields: [fromUserId], references: [id], onDelete: Cascade)
+  toUser       User     @relation("ReceivedReports", fields: [toUserId], references: [id], onDelete: Cascade)
+
+  type         String   // spam, harassment, fake_profile, ghost, other
+  description  String
+  status       String   @default("pending") // pending, reviewed, resolved
+
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  @@map("reports")
+}
+
+model Block {
+  id            String   @id @default(cuid())
+  userId        String
+  blockedUserId String
+  user          User     @relation("Blocker", fields: [userId], references: [id], onDelete: Cascade)
+  blockedUser   User     @relation("Blocked", fields: [blockedUserId], references: [id], onDelete: Cascade)
+
+  createdAt     DateTime @default(now())
+
+  @@unique([userId, blockedUserId])
+  @@map("blocks")
+}
+
+// =========================================
+// 14. Notification - 알림
+// =========================================
+model Notification {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  type      String   // new_match, invite_received, invite_accepted, checkin_reminder, etc.
+  title     String
+  message   String
+  link      String?  // 클릭 시 이동할 경로
+  read      Boolean  @default(false)
+
+  createdAt DateTime @default(now())
+
+  @@map("notifications")
+}

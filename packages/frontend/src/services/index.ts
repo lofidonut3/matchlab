@@ -1,0 +1,8 @@
+export { authService } from './auth.service'
+export { profileService } from './profile.service'
+export { matchingService } from './matching.service'
+export { inviteService } from './invite.service'
+export { teamService } from './team.service'
+export { checkinService } from './checkin.service'
+export { feedbackService } from './feedback.service'
+export { notificationService } from './notification.service'
