@@ -1,8 +1,11 @@
 import axios from 'axios'
 import type { AxiosError, InternalAxiosRequestConfig } from 'axios'
 
+// 환경변수에서 API URL 가져오기 (없으면 상대경로 /api 사용)
+const API_BASE_URL = import.meta.env.VITE_API_URL || '/api'
+
 const api = axios.create({
-  baseURL: '/api',
+  baseURL: API_BASE_URL,
   headers: {
     'Content-Type': 'application/json',
   },
