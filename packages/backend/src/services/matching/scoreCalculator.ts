@@ -7,7 +7,7 @@
 
 import { MATCHING_WEIGHTS, PENALTIES } from '@matchlab/shared';
 import type { StartupMBTI } from '@matchlab/shared';
-import { calculateStartupMBTICompatibility } from './startupMbtiCalculator';
+import { calculateStartupMBTICompatibility } from './startupMbtiCalculator.js';
 
 export interface ProfileForScoring {
   userId: string;
