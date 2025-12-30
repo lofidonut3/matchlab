@@ -136,10 +136,11 @@ export class AuthService {
   }
 
   private generateToken(userId: string, email: string): string {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     return jwt.sign(
       { userId, email },
-      config.jwtSecret,
-      { expiresIn: config.jwtExpiresIn }
+      config.jwtSecret as jwt.Secret,
+      { expiresIn: config.jwtExpiresIn } as jwt.SignOptions
     );
   }
 }

@@ -1,9 +1,9 @@
-import { Router } from 'express';
+import { Router, IRouter } from 'express';
 import { z } from 'zod';
 import { authService } from '../services/index.js';
 import { authMiddleware, AuthRequest } from '../middleware/index.js';
 
-const router = Router();
+const router: IRouter = Router();
 
 // Validation schemas
 const registerSchema = z.object({
@@ -25,7 +25,7 @@ router.post('/register', async (req, res, next) => {
   try {
     const data = registerSchema.parse(req.body);
     const result = await authService.register(data);
-    
+
     res.status(201).json({
       success: true,
       data: result,
@@ -43,7 +43,7 @@ router.post('/login', async (req, res, next) => {
   try {
     const data = loginSchema.parse(req.body);
     const result = await authService.login(data);
-    
+
     res.json({
       success: true,
       data: result,
@@ -60,7 +60,7 @@ router.post('/login', async (req, res, next) => {
 router.get('/me', authMiddleware, async (req: AuthRequest, res, next) => {
   try {
     const user = await authService.getMe(req.userId!);
-    
+
     res.json({
       success: true,
       data: user,

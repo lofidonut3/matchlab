@@ -1,9 +1,9 @@
-import { Router } from 'express';
+import { Router, IRouter } from 'express';
 import { z } from 'zod';
 import { inviteService } from '../services/index.js';
 import { authMiddleware, AuthRequest } from '../middleware/index.js';
 
-const router = Router();
+const router: IRouter = Router();
 
 const sendInviteSchema = z.object({
   toUserId: z.string(),
@@ -17,7 +17,7 @@ const sendInviteSchema = z.object({
 router.get('/', authMiddleware, async (req: AuthRequest, res, next) => {
   try {
     const invites = await inviteService.getInvites(req.userId!);
-    
+
     res.json({
       success: true,
       data: invites,
@@ -39,7 +39,7 @@ router.post('/', authMiddleware, async (req: AuthRequest, res, next) => {
       data.toUserId,
       data.message
     );
-    
+
     res.status(201).json({
       success: true,
       data: invite,
@@ -59,7 +59,7 @@ router.put('/:inviteId/accept', authMiddleware, async (req: AuthRequest, res, ne
       req.params.inviteId,
       req.userId!
     );
-    
+
     res.json({
       success: true,
       data: result,
@@ -79,7 +79,7 @@ router.put('/:inviteId/decline', authMiddleware, async (req: AuthRequest, res, n
       req.params.inviteId,
       req.userId!
     );
-    
+
     res.json({
       success: true,
       data: invite,

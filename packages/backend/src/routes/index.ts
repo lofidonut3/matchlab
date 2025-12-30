@@ -1,4 +1,4 @@
-import { Router } from 'express';
+import { Router, IRouter } from 'express';
 import authRoutes from './auth.routes.js';
 import profileRoutes from './profile.routes.js';
 import matchingRoutes from './matching.routes.js';
@@ -6,7 +6,7 @@ import inviteRoutes from './invite.routes.js';
 import teamRoutes from './team.routes.js';
 import notificationRoutes from './notification.routes.js';
 
-const router = Router();
+const router: IRouter = Router();
 
 // Health check
 router.get('/health', (req, res) => {

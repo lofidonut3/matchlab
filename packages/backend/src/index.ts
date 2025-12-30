@@ -1,10 +1,10 @@
-import express from 'express';
+import express, { Application } from 'express';
 import cors from 'cors';
 import { config } from './config/index.js';
 import { errorHandler } from './middleware/index.js';
 import routes from './routes/index.js';
 
-const app = express();
+const app: Application = express();
 
 // Middleware
 app.use(cors({

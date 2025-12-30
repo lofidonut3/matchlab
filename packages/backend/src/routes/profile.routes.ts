@@ -1,9 +1,9 @@
-import { Router } from 'express';
+import { Router, IRouter } from 'express';
 import { z } from 'zod';
 import { profileService } from '../services/index.js';
 import { authMiddleware, optionalAuthMiddleware, AuthRequest } from '../middleware/index.js';
 
-const router = Router();
+const router: IRouter = Router();
 
 // Validation schemas
 const onboardingSchema = z.object({
@@ -55,7 +55,7 @@ router.post('/onboarding', authMiddleware, async (req: AuthRequest, res, next) =
   try {
     const data = onboardingSchema.parse(req.body);
     const result = await profileService.completeOnboarding(req.userId!, data);
-    
+
     res.status(201).json({
       success: true,
       data: result,
@@ -72,7 +72,7 @@ router.post('/onboarding', authMiddleware, async (req: AuthRequest, res, next) =
 router.get('/profile', authMiddleware, async (req: AuthRequest, res, next) => {
   try {
     const profile = await profileService.getMyProfile(req.userId!);
-    
+
     res.json({
       success: true,
       data: profile,
@@ -90,7 +90,7 @@ router.put('/profile', authMiddleware, async (req: AuthRequest, res, next) => {
   try {
     const data = profileUpdateSchema.parse(req.body);
     const result = await profileService.updateProfile(req.userId!, data);
-    
+
     res.json({
       success: true,
       data: result,
@@ -107,7 +107,7 @@ router.put('/profile', authMiddleware, async (req: AuthRequest, res, next) => {
 router.get('/profile/:userId', optionalAuthMiddleware, async (req: AuthRequest, res, next) => {
   try {
     const profile = await profileService.getProfile(req.params.userId, req.userId);
-    
+
     res.json({
       success: true,
       data: profile,
@@ -130,7 +130,7 @@ router.post('/profile/evidence', authMiddleware, async (req: AuthRequest, res, n
       title,
       isPublic,
     });
-    
+
     res.status(201).json({
       success: true,
       data: link,
@@ -147,7 +147,7 @@ router.post('/profile/evidence', authMiddleware, async (req: AuthRequest, res, n
 router.put('/profile/evidence/:linkId/verify', authMiddleware, async (req: AuthRequest, res, next) => {
   try {
     const link = await profileService.verifyEvidenceLink(req.userId!, req.params.linkId);
-    
+
     res.json({
       success: true,
       data: link,

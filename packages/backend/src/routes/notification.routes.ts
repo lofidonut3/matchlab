@@ -1,8 +1,8 @@
-import { Router } from 'express';
+import { Router, IRouter } from 'express';
 import { notificationService } from '../services/index.js';
 import { authMiddleware, AuthRequest } from '../middleware/index.js';
 
-const router = Router();
+const router: IRouter = Router();
 
 /**
  * GET /api/notifications
@@ -12,13 +12,13 @@ router.get('/', authMiddleware, async (req: AuthRequest, res, next) => {
   try {
     const page = parseInt(req.query.page as string) || 1;
     const pageSize = parseInt(req.query.pageSize as string) || 20;
-    
+
     const result = await notificationService.getNotifications(
       req.userId!,
       page,
       pageSize
     );
-    
+
     res.json({
       success: true,
       data: result,
@@ -35,7 +35,7 @@ router.get('/', authMiddleware, async (req: AuthRequest, res, next) => {
 router.get('/unread-count', authMiddleware, async (req: AuthRequest, res, next) => {
   try {
     const count = await notificationService.getUnreadCount(req.userId!);
-    
+
     res.json({
       success: true,
       data: { count },
@@ -55,7 +55,7 @@ router.put('/:notificationId/read', authMiddleware, async (req: AuthRequest, res
       req.params.notificationId,
       req.userId!
     );
-    
+
     res.json({
       success: true,
       data: notification,
@@ -72,7 +72,7 @@ router.put('/:notificationId/read', authMiddleware, async (req: AuthRequest, res
 router.put('/read-all', authMiddleware, async (req: AuthRequest, res, next) => {
   try {
     await notificationService.markAllAsRead(req.userId!);
-    
+
     res.json({
       success: true,
       message: '모든 알림을 읽음 처리했습니다.',

@@ -1,9 +1,9 @@
-import { Router } from 'express';
+import { Router, IRouter } from 'express';
 import { z } from 'zod';
 import { teamService, checkInService, feedbackService, riskService } from '../services/index.js';
 import { authMiddleware, AuthRequest } from '../middleware/index.js';
 
-const router = Router();
+const router: IRouter = Router();
 
 const checkInSchema = z.object({
   sprintId: z.string(),
@@ -30,7 +30,7 @@ const feedbackSchema = z.object({
 router.get('/', authMiddleware, async (req: AuthRequest, res, next) => {
   try {
     const teams = await teamService.getMyTeams(req.userId!);
-    
+
     res.json({
       success: true,
       data: teams,
@@ -47,7 +47,7 @@ router.get('/', authMiddleware, async (req: AuthRequest, res, next) => {
 router.get('/:teamId', authMiddleware, async (req: AuthRequest, res, next) => {
   try {
     const team = await teamService.getTeam(req.params.teamId, req.userId!);
-    
+
     res.json({
       success: true,
       data: team,
@@ -68,7 +68,7 @@ router.put('/:teamId', authMiddleware, async (req: AuthRequest, res, next) => {
       req.userId!,
       req.body
     );
-    
+
     res.json({
       success: true,
       data: team,
@@ -88,7 +88,7 @@ router.put('/:teamId/checklist/:itemId', authMiddleware, async (req: AuthRequest
       req.params.itemId,
       req.userId!
     );
-    
+
     res.json({
       success: true,
       data: item,
@@ -110,7 +110,7 @@ router.post('/:teamId/finish', authMiddleware, async (req: AuthRequest, res, nex
       req.userId!,
       decision
     );
-    
+
     res.json({
       success: true,
       data: team,
@@ -128,7 +128,7 @@ router.post('/checkins', authMiddleware, async (req: AuthRequest, res, next) => 
   try {
     const data = checkInSchema.parse(req.body);
     const result = await checkInService.submitCheckIn(req.userId!, data);
-    
+
     res.status(201).json({
       success: true,
       data: result,
@@ -145,7 +145,7 @@ router.post('/checkins', authMiddleware, async (req: AuthRequest, res, next) => 
 router.get('/checkins/needed', authMiddleware, async (req: AuthRequest, res, next) => {
   try {
     const needed = await checkInService.checkInNeeded(req.userId!);
-    
+
     res.json({
       success: true,
       data: needed,
@@ -162,21 +162,21 @@ router.get('/checkins/needed', authMiddleware, async (req: AuthRequest, res, nex
 router.get('/:teamId/checkins', authMiddleware, async (req: AuthRequest, res, next) => {
   try {
     // 팀에서 현재 스프린트 ID 조회
-    const team = await teamService.getTeam(req.params.teamId, req.userId!);
-    const currentSprint = team.sprints.find((s: any) => s.status === 'in_progress');
-    
+    const teamData = await teamService.getTeam(req.params.teamId, req.userId!);
+    const currentSprint = teamData.team.sprints?.find((s: any) => s.status === 'in_progress');
+
     if (!currentSprint) {
       return res.json({
         success: true,
         data: [],
       });
     }
-    
+
     const checkIns = await checkInService.getCheckIns(
       currentSprint.id,
       req.userId!
     );
-    
+
     res.json({
       success: true,
       data: checkIns,
@@ -194,7 +194,7 @@ router.get('/:teamId/health', authMiddleware, async (req: AuthRequest, res, next
   try {
     const health = await riskService.calculateTeamHealth(req.params.teamId);
     const suggestions = await riskService.generateAdjustmentSuggestions(req.params.teamId);
-    
+
     res.json({
       success: true,
       data: { ...health, suggestions },
@@ -212,7 +212,7 @@ router.post('/feedbacks', authMiddleware, async (req: AuthRequest, res, next) =>
   try {
     const data = feedbackSchema.parse(req.body);
     const feedback = await feedbackService.submitFeedback(req.userId!, data);
-    
+
     res.status(201).json({
       success: true,
       data: feedback,
@@ -232,7 +232,7 @@ router.get('/:teamId/feedback-status', authMiddleware, async (req: AuthRequest, 
       req.params.teamId,
       req.userId!
     );
-    
+
     res.json({
       success: true,
       data: status,

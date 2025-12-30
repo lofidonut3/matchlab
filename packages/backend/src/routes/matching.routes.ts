@@ -1,8 +1,8 @@
-import { Router } from 'express';
+import { Router, IRouter } from 'express';
 import { matchingService } from '../services/index.js';
 import { authMiddleware, AuthRequest } from '../middleware/index.js';
 
-const router = Router();
+const router: IRouter = Router();
 
 /**
  * GET /api/matches/recommendations
@@ -12,7 +12,7 @@ router.get('/recommendations', authMiddleware, async (req: AuthRequest, res, nex
   try {
     const limit = parseInt(req.query.limit as string) || 10;
     const result = await matchingService.getRecommendations(req.userId!, limit);
-    
+
     res.json({
       success: true,
       data: result,
@@ -32,7 +32,7 @@ router.get('/:candidateId', authMiddleware, async (req: AuthRequest, res, next) 
       req.userId!,
       req.params.candidateId
     );
-    
+
     res.json({
       success: true,
       data: result,
@@ -49,7 +49,7 @@ router.get('/:candidateId', authMiddleware, async (req: AuthRequest, res, next) 
 router.get('/', authMiddleware, async (req: AuthRequest, res, next) => {
   try {
     console.log('[EXPLORE] Request from userId:', req.userId);
-    
+
     // 쿼리 파라미터를 배열로 변환하는 헬퍼 함수
     const toArray = (val: any): string[] | undefined => {
       if (!val) return undefined;
@@ -57,7 +57,7 @@ router.get('/', authMiddleware, async (req: AuthRequest, res, next) => {
       if (typeof val === 'string') return val.split(',');
       return undefined;
     };
-    
+
     const filters = {
       domains: toArray(req.query.domains),
       roles: toArray(req.query.roles),
@@ -67,13 +67,13 @@ router.get('/', authMiddleware, async (req: AuthRequest, res, next) => {
       maxHours: req.query.maxHours ? parseInt(req.query.maxHours as string) : undefined,
     };
     console.log('[EXPLORE] Filters:', filters);
-    
+
     const page = parseInt(req.query.page as string) || 1;
     const pageSize = parseInt(req.query.pageSize as string) || 20;
-    
+
     const result = await matchingService.explore(req.userId!, filters, page, pageSize);
     console.log('[EXPLORE] Success, items count:', result.items?.length);
-    
+
     res.json({
       success: true,
       data: result,
