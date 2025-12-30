@@ -1,0 +1,14 @@
+[phases.setup]
+nixPkgs = ["nodejs_18", "pnpm-9_x", "openssl"]
+
+[phases.install]
+cmds = ["pnpm i --frozen-lockfile"]
+
+[phases.build]
+cmds = [
+  "cd packages/shared && pnpm build",
+  "cd packages/backend && pnpm build"
+]
+
+[start]
+cmd = "cd packages/backend && pnpm start:prod"
