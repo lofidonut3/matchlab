@@ -27,7 +27,7 @@ import {
   Input,
   Select
 } from '../../components/common'
-import type { Profile } from '@matchlab/shared'
+import type { Profile, EvidenceType } from '@matchlab/shared'
 
 export default function MyProfilePage() {
   const { user } = useAuthStore()
@@ -35,7 +35,7 @@ export default function MyProfilePage() {
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [showEvidenceModal, setShowEvidenceModal] = useState(false)
-  const [evidenceData, setEvidenceData] = useState({ type: 'LINKEDIN', url: '' })
+  const [evidenceData, setEvidenceData] = useState<{ type: EvidenceType; url: string }>({ type: 'linkedin', url: '' })
   const [isSubmitting, setIsSubmitting] = useState(false)
 
   useEffect(() => {
@@ -62,7 +62,7 @@ export default function MyProfilePage() {
         url: evidenceData.url,
       })
       setShowEvidenceModal(false)
-      setEvidenceData({ type: 'LINKEDIN', url: '' })
+      setEvidenceData({ type: 'linkedin', url: '' })
       fetchProfile()
     } catch (err) {
       // Error handling
@@ -273,13 +273,13 @@ export default function MyProfilePage() {
           <Select
             label="유형"
             value={evidenceData.type}
-            onChange={(e) => setEvidenceData({ ...evidenceData, type: e.target.value })}
+            onChange={(e) => setEvidenceData({ ...evidenceData, type: e.target.value as EvidenceType })}
             options={[
-              { value: 'LINKEDIN', label: 'LinkedIn' },
-              { value: 'GITHUB', label: 'GitHub' },
-              { value: 'PORTFOLIO', label: '포트폴리오' },
-              { value: 'NEWS', label: '뉴스 기사' },
-              { value: 'OTHER', label: '기타' },
+              { value: 'linkedin', label: 'LinkedIn' },
+              { value: 'github', label: 'GitHub' },
+              { value: 'portfolio', label: '포트폴리오' },
+              { value: 'blog', label: '블로그' },
+              { value: 'other', label: '기타' },
             ]}
           />
 

@@ -25,7 +25,7 @@ export const useNotificationStore = create<NotificationState>((set, get) => ({
     set({ isLoading: true, error: null })
     try {
       const notifications = await notificationService.getNotifications()
-      const unreadCount = notifications.filter(n => !n.isRead).length
+      const unreadCount = notifications.filter(n => !n.read).length
       set({ notifications, unreadCount, isLoading: false })
     } catch (error) {
       const message = error instanceof Error ? error.message : '알림을 불러오는데 실패했습니다.'
@@ -47,7 +47,7 @@ export const useNotificationStore = create<NotificationState>((set, get) => ({
       await notificationService.markAsRead(notificationId)
       set({
         notifications: get().notifications.map(n =>
-          n.id === notificationId ? { ...n, isRead: true } : n
+          n.id === notificationId ? { ...n, read: true } : n
         ),
         unreadCount: Math.max(0, get().unreadCount - 1),
       })
@@ -60,7 +60,7 @@ export const useNotificationStore = create<NotificationState>((set, get) => ({
     try {
       await notificationService.markAllAsRead()
       set({
-        notifications: get().notifications.map(n => ({ ...n, isRead: true })),
+        notifications: get().notifications.map(n => ({ ...n, read: true })),
         unreadCount: 0,
       })
     } catch (error) {

@@ -6,8 +6,7 @@ import {
   Mail, 
   UserCircle, 
   Bell, 
-  LogOut, 
-  Home,
+  LogOut,
   Sparkles
 } from 'lucide-react'
 import { useAuthStore } from '../stores/auth.store'
@@ -89,9 +88,9 @@ export default function MainLayout() {
               </NavLink>
 
               <div className="flex items-center gap-2">
-                <Avatar name={user?.name || 'User'} size="sm" />
+                <Avatar name={user?.nickname || 'User'} size="sm" />
                 <span className="hidden sm:block text-sm font-medium text-gray-700">
-                  {user?.name}
+                  {user?.nickname}
                 </span>
               </div>
 

@@ -53,7 +53,7 @@ export const useInviteStore = create<InviteState>((set, get) => ({
       await inviteService.acceptInvite(inviteId)
       set({
         receivedInvites: get().receivedInvites.map(inv =>
-          inv.id === inviteId ? { ...inv, status: 'ACCEPTED' as const } : inv
+          inv.id === inviteId ? { ...inv, status: 'accepted' as const } : inv
         ),
         isLoading: false,
       })
@@ -70,7 +70,7 @@ export const useInviteStore = create<InviteState>((set, get) => ({
       await inviteService.declineInvite(inviteId)
       set({
         receivedInvites: get().receivedInvites.map(inv =>
-          inv.id === inviteId ? { ...inv, status: 'DECLINED' as const } : inv
+          inv.id === inviteId ? { ...inv, status: 'declined' as const } : inv
         ),
         isLoading: false,
       })

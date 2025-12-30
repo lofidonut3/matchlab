@@ -413,8 +413,8 @@ export interface CheckIn {
 
 // 체크인 요청
 export interface CheckInRequest {
-  sprintId: string;
-  progress: number;
+  sprintId?: string;
+  progress?: number;
   satisfaction: number;
   blockers?: string;
   notes?: string;
@@ -437,15 +437,17 @@ export interface Feedback {
   createdAt: string;
 }
 
-// 피드백 요청
+// 피드백 요청 (간단한 버전)
 export interface FeedbackRequest {
-  toUserId: string;
-  teamId: string;
-  ratingPromise: number;
-  ratingResponse: number;
-  ratingContribution: number;
+  targetUserId?: string;
+  toUserId?: string;
+  teamId?: string;
+  rating?: number;
+  ratingPromise?: number;
+  ratingResponse?: number;
+  ratingContribution?: number;
   comment?: string;
-  decision: TeamDecision;
+  decision?: TeamDecision;
 }
 
 // =========================================
@@ -518,3 +520,34 @@ export interface PaginatedResponse<T> {
 
 // Profile alias for backward compatibility
 export type Profile = ProfileData;
+
+// 프로필 수정 요청
+export interface ProfileUpdateRequest {
+  bio?: string;
+  location?: string;
+  locationPref?: LocationPref;
+  availabilityHours?: number;
+  startDate?: string;
+  domains?: Domain[];
+  roleCan?: Role[];
+  roleWant?: Role[];
+  roleNeed?: Role[];
+  skills?: string[];
+  commChannel?: CommChannel;
+  responseSla?: number;
+  meetingFreq?: MeetingFreq;
+  goal?: Goal;
+  decisionConsensus?: number;
+  decisionData?: number;
+  decisionSpeed?: number;
+  decisionFlexibility?: number;
+  decisionRisk?: number;
+  conflictStyle?: ConflictStyle;
+}
+
+// 증거 링크 요청
+export interface EvidenceLinkRequest {
+  type: EvidenceType;
+  url: string;
+  title?: string;
+}

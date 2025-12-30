@@ -5,8 +5,7 @@ import { useNotificationStore } from '../stores/notification.store'
 import { 
   Button, 
   Card, 
-  CardContent, 
-  Badge, 
+  CardContent,
   LoadingSpinner, 
   EmptyState 
 } from '../components/common'
@@ -47,7 +46,7 @@ export default function NotificationsPage() {
   }
 
   const handleNotificationClick = async (notification: any) => {
-    if (!notification.isRead) {
+    if (!notification.read) {
       await markAsRead(notification.id)
     }
 
@@ -113,7 +112,7 @@ export default function NotificationsPage() {
               key={notification.id}
               hoverable
               onClick={() => handleNotificationClick(notification)}
-              className={!notification.isRead ? 'border-primary-200 bg-primary-50/50' : ''}
+              className={!notification.read ? 'border-primary-200 bg-primary-50/50' : ''}
             >
               <CardContent className="p-4">
                 <div className="flex items-start gap-3">
@@ -121,14 +120,14 @@ export default function NotificationsPage() {
                     {getNotificationIcon(notification.type)}
                   </div>
                   <div className="flex-1 min-w-0">
-                    <p className={`text-gray-900 ${!notification.isRead ? 'font-medium' : ''}`}>
+                    <p className={`text-gray-900 ${!notification.read ? 'font-medium' : ''}`}>
                       {notification.message}
                     </p>
                     <p className="text-sm text-gray-500 mt-1">
                       {timeAgo(new Date(notification.createdAt))}
                     </p>
                   </div>
-                  {!notification.isRead && (
+                  {!notification.read && (
                     <div className="w-2 h-2 bg-primary-600 rounded-full flex-shrink-0 mt-2" />
                   )}
                 </div>

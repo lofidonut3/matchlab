@@ -7,7 +7,6 @@ import {
   Circle, 
   Users, 
   Clock,
-  AlertTriangle,
   Flag,
   MessageSquare
 } from 'lucide-react'
@@ -111,8 +110,8 @@ export default function TeamDetailPage() {
   }
 
   const members = (currentTeam as any).members || []
-  const isActive = currentTeam.status === 'ACTIVE'
-  const completedItems = currentSprint?.checklistItems?.filter(item => item.isCompleted).length || 0
+  const isActive = currentTeam.status === 'active'
+  const completedItems = currentSprint?.checklistItems?.filter(item => item.completed).length || 0
   const totalItems = currentSprint?.checklistItems?.length || 0
   const progressPercent = totalItems > 0 ? (completedItems / totalItems) * 100 : 0
 
@@ -252,23 +251,23 @@ export default function TeamDetailPage() {
                 <div
                   key={item.id}
                   className={`flex items-center gap-3 p-3 rounded-lg border transition-colors cursor-pointer ${
-                    item.isCompleted 
+                    item.completed 
                       ? 'bg-success-50 border-success-200' 
                       : 'bg-white border-gray-200 hover:border-gray-300'
                   }`}
                   onClick={() => isActive && handleToggleItem(item.id)}
                 >
-                  {item.isCompleted ? (
+                  {item.completed ? (
                     <CheckCircle className="w-5 h-5 text-success-600 flex-shrink-0" />
                   ) : (
                     <Circle className="w-5 h-5 text-gray-400 flex-shrink-0" />
                   )}
-                  <span className={item.isCompleted ? 'line-through text-gray-500' : 'text-gray-900'}>
+                  <span className={item.completed ? 'line-through text-gray-500' : 'text-gray-900'}>
                     {item.title}
                   </span>
-                  {item.dueDay && (
+                  {item.description && (
                     <span className="ml-auto text-sm text-gray-500">
-                      Day {item.dueDay}
+                      {item.description}
                     </span>
                   )}
                 </div>

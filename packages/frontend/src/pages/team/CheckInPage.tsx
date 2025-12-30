@@ -22,7 +22,7 @@ export default function CheckInPage() {
     try {
       await checkinService.submitCheckIn(teamId, {
         satisfaction,
-        note: note || undefined,
+        notes: note || undefined,
       })
       navigate(`/teams/${teamId}`)
     } catch (err) {

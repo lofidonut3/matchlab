@@ -122,7 +122,7 @@ export default function RecommendPage() {
         {targetMatch && (
           <div className="space-y-4">
             <p className="text-gray-600">
-              <strong className="text-gray-900">{targetMatch.name}</strong>님에게 초대 메시지를 보내시겠습니까?
+              <strong className="text-gray-900">{targetMatch.nickname}</strong>님에게 초대 메시지를 보내시겠습니까?
             </p>
 
             {inviteError && (

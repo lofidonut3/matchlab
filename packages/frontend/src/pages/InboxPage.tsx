@@ -12,7 +12,7 @@ import {
   EmptyState,
   Alert 
 } from '../components/common'
-import { ROLE_OPTIONS, DOMAIN_OPTIONS } from '@matchlab/shared'
+import { ROLE_OPTIONS } from '@matchlab/shared'
 
 export default function InboxPage() {
   const navigate = useNavigate()
@@ -50,19 +50,19 @@ export default function InboxPage() {
 
   const getStatusBadge = (status: string) => {
     switch (status) {
-      case 'PENDING':
+      case 'pending':
         return <Badge variant="warning"><Clock className="w-3 h-3 mr-1" /> 대기중</Badge>
-      case 'ACCEPTED':
+      case 'accepted':
         return <Badge variant="success"><Check className="w-3 h-3 mr-1" /> 수락됨</Badge>
-      case 'DECLINED':
+      case 'declined':
         return <Badge variant="danger"><X className="w-3 h-3 mr-1" /> 거절됨</Badge>
       default:
         return <Badge>{status}</Badge>
     }
   }
 
-  const pendingReceived = receivedInvites.filter(i => i.status === 'PENDING')
-  const processedReceived = receivedInvites.filter(i => i.status !== 'PENDING')
+  const pendingReceived = receivedInvites.filter(i => i.status === 'pending')
+  const processedReceived = receivedInvites.filter(i => i.status !== 'pending')
 
   if (isLoading && receivedInvites.length === 0 && sentInvites.length === 0) {
     return (
