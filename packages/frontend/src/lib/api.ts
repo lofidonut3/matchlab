@@ -39,8 +39,22 @@ api.interceptors.response.use(
         window.location.href = '/login'
       }
     }
-    
-    const message = error.response?.data?.error || error.response?.data?.message || error.message || '알 수 없는 오류가 발생했습니다.'
+
+    // 에러 메시지 추출 - 객체인 경우 안전하게 처리
+    let message = '알 수 없는 오류가 발생했습니다.'
+    const errorData = error.response?.data?.error
+    const messageData = error.response?.data?.message
+
+    if (typeof errorData === 'string') {
+      message = errorData
+    } else if (typeof messageData === 'string') {
+      message = messageData
+    } else if (error.message && typeof error.message === 'string') {
+      message = error.message
+    } else if (errorData && typeof errorData === 'object') {
+      message = JSON.stringify(errorData)
+    }
+
     return Promise.reject(new Error(message))
   }
 )
