@@ -4,14 +4,14 @@ import { ArrowLeft, Save } from 'lucide-react'
 import { ROLE_OPTIONS, DOMAIN_OPTIONS, GOAL_OPTIONS, LOCATION_OPTIONS, MEETING_FREQ_OPTIONS } from '@matchlab/shared'
 import type { LocationPref, MeetingFreq, Goal, Domain, Role } from '@matchlab/shared'
 import { profileService } from '../../services'
-import { 
-  Button, 
-  Card, 
-  CardContent, 
-  Select, 
+import {
+  Button,
+  Card,
+  CardContent,
+  Select,
   Textarea,
-  LoadingSpinner, 
-  Alert 
+  LoadingSpinner,
+  Alert
 } from '../../components/common'
 
 export default function EditProfilePage() {
@@ -85,9 +85,9 @@ export default function EditProfilePage() {
   return (
     <div className="max-w-2xl mx-auto px-4 py-6 sm:py-8">
       {/* Back Button */}
-      <Button 
-        variant="ghost" 
-        onClick={() => navigate('/my-profile')} 
+      <Button
+        variant="ghost"
+        onClick={() => navigate('/my-profile')}
         leftIcon={<ArrowLeft className="w-4 h-4" />}
         className="mb-4 sm:mb-6"
       >

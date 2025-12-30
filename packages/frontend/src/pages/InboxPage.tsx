@@ -2,28 +2,28 @@ import { useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { Mail, Check, X, Clock, MessageSquare } from 'lucide-react'
 import { useInviteStore } from '../stores/invite.store'
-import { 
-  Button, 
-  Card, 
-  CardContent, 
-  Badge, 
-  Avatar, 
-  LoadingSpinner, 
+import {
+  Button,
+  Card,
+  CardContent,
+  Badge,
+  Avatar,
+  LoadingSpinner,
   EmptyState,
-  Alert 
+  Alert
 } from '../components/common'
 import { ROLE_OPTIONS } from '@matchlab/shared'
 
 export default function InboxPage() {
   const navigate = useNavigate()
-  const { 
-    sentInvites, 
-    receivedInvites, 
-    isLoading, 
-    error, 
+  const {
+    sentInvites,
+    receivedInvites,
+    isLoading,
+    error,
     fetchInvites,
     acceptInvite,
-    declineInvite 
+    declineInvite
   } = useInviteStore()
 
   useEffect(() => {
@@ -101,7 +101,7 @@ export default function InboxPage() {
             {pendingReceived.map((invite) => {
               const senderProfile = invite.fromUser?.profile
               const roleLabel = senderProfile ? ROLE_OPTIONS.find(r => r.value === senderProfile.roleWant?.[0])?.label : ''
-              
+
               return (
                 <Card key={invite.id}>
                   <CardContent className="p-4 sm:p-5">
@@ -172,7 +172,7 @@ export default function InboxPage() {
             {sentInvites.map((invite) => {
               const targetProfile = invite.toUser?.profile
               const roleLabel = targetProfile ? ROLE_OPTIONS.find(r => r.value === targetProfile.roleWant?.[0])?.label : ''
-              
+
               return (
                 <Card key={invite.id}>
                   <CardContent className="p-5">

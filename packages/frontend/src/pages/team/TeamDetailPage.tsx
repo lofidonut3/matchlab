@@ -1,11 +1,11 @@
 import { useEffect, useState } from 'react'
 import { useParams, useNavigate, Link } from 'react-router-dom'
-import { 
-  ArrowLeft, 
-  Calendar, 
-  CheckCircle, 
-  Circle, 
-  Users, 
+import {
+  ArrowLeft,
+  Calendar,
+  CheckCircle,
+  Circle,
+  Users,
   Clock,
   Flag,
   MessageSquare
@@ -13,14 +13,14 @@ import {
 import { useTeamStore } from '../../stores/team.store'
 import { useAuthStore } from '../../stores/auth.store'
 import { checkinService, feedbackService } from '../../services'
-import { 
-  Button, 
-  Card, 
-  CardContent, 
-  CardHeader, 
-  Badge, 
-  Avatar, 
-  LoadingSpinner, 
+import {
+  Button,
+  Card,
+  CardContent,
+  CardHeader,
+  Badge,
+  Avatar,
+  LoadingSpinner,
   Alert,
   ProgressBar,
   Modal,
@@ -33,7 +33,7 @@ export default function TeamDetailPage() {
   const navigate = useNavigate()
   const { user } = useAuthStore()
   const { currentTeam, currentSprint, isLoading, fetchTeam, toggleChecklistItem, finishTeam } = useTeamStore()
-  
+
   const [checkInNeeded, setCheckInNeeded] = useState(false)
   const [showFinishModal, setShowFinishModal] = useState(false)
   const [showFeedbackModal, setShowFeedbackModal] = useState(false)
@@ -82,7 +82,7 @@ export default function TeamDetailPage() {
     setIsSubmitting(true)
     try {
       await feedbackService.submitFeedback(teamId, {
-        targetUserId: feedbackTarget,
+        toUserId: feedbackTarget,
         rating: feedbackData.rating,
         comment: feedbackData.comment || undefined,
       })
@@ -120,9 +120,9 @@ export default function TeamDetailPage() {
   return (
     <div className="max-w-4xl mx-auto px-4 py-6 sm:py-8">
       {/* Back Button */}
-      <Button 
-        variant="ghost" 
-        onClick={() => navigate('/teams')} 
+      <Button
+        variant="ghost"
+        onClick={() => navigate('/teams')}
         leftIcon={<ArrowLeft className="w-4 h-4" />}
         className="mb-4 sm:mb-6"
       >
@@ -151,7 +151,7 @@ export default function TeamDetailPage() {
                 </span>
               </div>
             </div>
-            
+
             {isActive && (
               <div className="flex flex-col sm:flex-row gap-2 w-full sm:w-auto">
                 {checkInNeeded && (
@@ -161,7 +161,7 @@ export default function TeamDetailPage() {
                     </Button>
                   </Link>
                 )}
-                <Button 
+                <Button
                   variant="secondary"
                   onClick={() => setShowFinishModal(true)}
                   leftIcon={<Flag className="w-4 h-4" />}
@@ -195,14 +195,14 @@ export default function TeamDetailPage() {
         <CardContent>
           <div className="grid md:grid-cols-2 gap-4">
             {members.map((member: any) => (
-              <div 
+              <div
                 key={member.userId}
                 className="flex items-center gap-3 p-3 rounded-lg bg-gray-50"
               >
-                <Avatar name={member.user?.name || '사용자'} size="md" />
+                <Avatar name={member.user?.nickname || '사용자'} size="md" />
                 <div className="flex-1">
                   <div className="font-medium text-gray-900">
-                    {member.user?.name}
+                    {member.user?.nickname}
                     {member.userId === user?.id && (
                       <span className="text-sm text-gray-500 ml-1">(나)</span>
                     )}
@@ -239,8 +239,8 @@ export default function TeamDetailPage() {
             </div>
           </CardHeader>
           <CardContent>
-            <ProgressBar 
-              value={progressPercent} 
+            <ProgressBar
+              value={progressPercent}
               variant={progressPercent >= 80 ? 'success' : progressPercent >= 50 ? 'warning' : 'primary'}
               size="lg"
               className="mb-6"
@@ -250,11 +250,10 @@ export default function TeamDetailPage() {
               {currentSprint.checklistItems?.map((item) => (
                 <div
                   key={item.id}
-                  className={`flex items-center gap-3 p-3 rounded-lg border transition-colors cursor-pointer ${
-                    item.completed 
-                      ? 'bg-success-50 border-success-200' 
+                  className={`flex items-center gap-3 p-3 rounded-lg border transition-colors cursor-pointer ${item.completed
+                      ? 'bg-success-50 border-success-200'
                       : 'bg-white border-gray-200 hover:border-gray-300'
-                  }`}
+                    }`}
                   onClick={() => isActive && handleToggleItem(item.id)}
                 >
                   {item.completed ? (
@@ -303,8 +302,8 @@ export default function TeamDetailPage() {
             <Button variant="secondary" onClick={() => setShowFinishModal(false)}>
               취소
             </Button>
-            <Button 
-              variant="danger" 
+            <Button
+              variant="danger"
               onClick={handleFinishTeam}
               isLoading={isSubmitting}
             >
@@ -322,7 +321,7 @@ export default function TeamDetailPage() {
       >
         <div className="space-y-4">
           <p className="text-gray-600">
-            {otherMembers.find((m: any) => m.userId === feedbackTarget)?.user?.name}님에 대한 피드백을 남겨주세요.
+            {otherMembers.find((m: any) => m.userId === feedbackTarget)?.user?.nickname}님에 대한 피드백을 남겨주세요.
           </p>
 
           <Select
@@ -350,7 +349,7 @@ export default function TeamDetailPage() {
             <Button variant="secondary" onClick={() => setShowFeedbackModal(false)}>
               취소
             </Button>
-            <Button 
+            <Button
               onClick={handleSubmitFeedback}
               isLoading={isSubmitting}
             >
